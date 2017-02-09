@@ -5,7 +5,7 @@ package com.amarsoft.app.model;
  * externalv4
  * 流程模型
  */
-public class ProcessTaskModel {
+public class MonitorModel {
     private String serialNo; //企业流水号
     private String orgName; //机构名
     private String enterpriseName; //企业名字
@@ -19,6 +19,24 @@ public class ProcessTaskModel {
     private String taskStage; //任务阶段
     private String bankId; //机构号
     private String inputTime;
+    private int relaLevel; //关联企业深度：1,2,3
+    private String relaEnts; //关联企业，";"分割
+
+    public int getRelaLevel() {
+        return relaLevel;
+    }
+
+    public void setRelaLevel(int relaLevel) {
+        this.relaLevel = relaLevel;
+    }
+
+    public String getRelaEnts() {
+        return relaEnts;
+    }
+
+    public void setRelaEnts(String relaEnts) {
+        this.relaEnts = relaEnts;
+    }
 
     public String getIdNo() {
         return idNo;
