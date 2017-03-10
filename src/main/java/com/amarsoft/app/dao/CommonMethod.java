@@ -2,6 +2,7 @@ package com.amarsoft.app.dao;
 
 import com.amarsoft.app.model.MonitorModel;
 import com.amarsoft.are.ARE;
+import com.amarsoft.requestqueue.IDataProcessTaskManage;
 import com.amarsoft.rmi.requestdata.CreatePocInspectListDate;
 import net.sf.json.JSONObject;
 import org.codehaus.xfire.client.Client;
@@ -43,10 +44,10 @@ public class CommonMethod {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        String selectSql = "select serinalno,orgname,enterprisename,idno,monitorurl,stockblock,inspectlevel,inspectstate,inputtime from spider_inspect_entity where bankID = ? and  inspectstate = 'Y' and modelId = ?";
+        String selectSql = "select serinalno,orgname,enterprisename,idno,monitorurl,stockblock,inspectlevel,inspectstate,inputtime, bankid from spider_inspect_entity where bankID = ? and  inspectstate = 'Y' and modelId = ?";
 
         try {
-            conn = ARE.getDBConnection("78_crsbjt");
+            conn = ARE.getDBConnection("crsbjt");
             ps = conn.prepareStatement(selectSql);
             ps.setString(1, bankID);
             ps.setString(2, modelId);
@@ -62,6 +63,7 @@ public class CommonMethod {
                 monitorModel.setInspectLevel(rs.getString("inspectlevel"));
                 monitorModel.setInspectState(rs.getString("inspectstate"));
                 monitorModel.setInputTime(rs.getString("inputtime"));
+                monitorModel.setBankId(rs.getString("bankid"));
                 entMonitorUrl.add(monitorModel);
             }
         } catch (SQLException e) {
@@ -97,10 +99,10 @@ public class CommonMethod {
         PreparedStatement ps = null;
         Map<String, String> relaMap = new HashMap<String, String>();
 
-        String sql = "select LEVEL1RELAENTNAME, LEVEL2RELAENTNAME from relation_info_mlevel where ENTNAME=? AND LEVEL='2'";
+        String sql = "select LEVEL1RELAENTNAME, LEVEL2RELAENTNAME from cr_relation_info_mlevel where ENTNAME=?";
 
         try {
-            conn = ARE.getDBConnection("relaEnt");
+            conn = ARE.getDBConnection("crsbjt");
             ps = conn.prepareStatement(sql);
 
             for (MonitorModel monitorModel : monitorModels) {
@@ -135,12 +137,13 @@ public class CommonMethod {
 
     /**
      * 调DOService,插入企业名单信息到诉讼主体表（law_ent_info）
+     *
      * @param entName 企业名
      * @param bankId  机构编号
      * @param orgName 机构名字
      * @return
      */
-    public static boolean syncMainEntToLiraOperation(String entName, String bankId, String orgName) {
+    public boolean syncMainEntToLiraOperation(String entName, String bankId, String orgName) {
 
         boolean flag = false;
         try {
@@ -173,31 +176,33 @@ public class CommonMethod {
             ARE.getLog().debug("客户端结果：" + results[0]);
             System.out.println("实现类：" + results[0].getClass().getName());
             flag = true;
-        }catch(MalformedURLException e){
+        } catch (MalformedURLException e) {
             flag = false;
             e.printStackTrace();
-        }catch(Exception e){
+        } catch (Exception e) {
             flag = false;
             e.printStackTrace();
-        }finally {
+        } finally {
             return flag;
         }
     }
 
     /**
      * 通过接口，由企业名单生成spider_inspect_entity,并初始化data_process_task流程
+     *
      * @param orgname
      * @param entnameList
-     * @param datatypeList
      * @return
      */
-    public boolean createPocInspectListDate(String orgname, List<String> entnameList, List<String> datatypeList) {
+    public boolean createPocInspectListDateV4(String orgname, String[] entnameList) {
         boolean flag = false;
         ARE.getLog().info("======================远程API方法调用开始===================");
         try {
             CreatePocInspectListDate createPocInspectListDate = (CreatePocInspectListDate)
                     Naming.lookup("rmi://" + registryHost + ":" + registryPort + "/pocInspectList");
-            createPocInspectListDate.InsertPocInspectList(orgname, entnameList, datatypeList);
+            for (String entName : entnameList) {
+                createPocInspectListDate.InsertPocInspectListOfV4(orgname, entName);
+            }
             flag = true;
         } catch (Exception e) {
             ARE.getLog().error("远程RMI出错", e);
@@ -207,21 +212,26 @@ public class CommonMethod {
         return flag;
     }
 
-
-    public static void main(String[] args){
-        ARE.init();
-        CommonMethod commonMethod = new CommonMethod();
-        //commonMethod.syncMainEntToLiraOperation("测试企业2", "测试机构编号2", "测试机构名2");
-
-        List<String> entnameList = new LinkedList<String>();
-        List<String> datatypeList = new LinkedList<String>();
-        entnameList.add("测试企业1");
-        entnameList.add("测试企业2");
-        datatypeList.add("诉讼");
-        datatypeList.add("被执行人");
-        datatypeList.add("失信被执行人");
-        datatypeList.add("舆情");
-        commonMethod.createPocInspectListDate("TESTVIRTUALORGNAME1", entnameList, datatypeList);
-
+    /**
+     * @param batchId
+     * @param jobClassName
+     * @param status
+     * @return
+     */
+    public boolean updateFlowStatusByRMI(String batchId, String jobClassName, String status) {
+        boolean flag = false;
+        ARE.getLog().info("======================远程API方法调用开始===================");
+        try {
+            IDataProcessTaskManage flowManage = (IDataProcessTaskManage)
+                    Naming.lookup("rmi://" + registryHost + ":" + registryPort + "/flowManage");
+            flowManage.updateExeStatus(batchId, jobClassName, status);
+            flag = true;
+        } catch (Exception e) {
+            ARE.getLog().error("远程RMI出错", e);
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
     }
+
 }

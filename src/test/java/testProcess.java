@@ -16,11 +16,13 @@ public class testProcess {
 
         String bankId = arg.getArgument("bankId");//机构编号
         String modelId = arg.getArgument("modelId");//模型编号
-        String batchId = arg.getArgument("azkabanExecId");//azkaban执行编号
+        String azkabanExecId = arg.getArgument("azkabanExecId");//azkaban执行编号
+        String batchId = arg.getArgument("batchId");//王军批次号
         //TODO:测试数据
-        bankId = "SuZhouBank";
-        modelId = "诉讼结构化A";
-        batchId = "flowid1";
+        bankId = "poc-EDS测试账号";
+        modelId = "V4报告";
+        azkabanExecId = "aztest";
+        batchId = "poc-EDS测试账号-1489053234690";
         //获取报告名单企业
 
         if(bankId == null){
@@ -29,10 +31,7 @@ public class testProcess {
             ARE.setProperty("BANKID", bankId);//日志文件按银行编号存储区分
         }
 
-
         ExternalV4Job externalV4Job = new ExternalV4Job();
-        externalV4Job.generateProcess(batchId, modelId, bankId);
-
-
+        externalV4Job.generateProcess(azkabanExecId, modelId, bankId);
     }
 }

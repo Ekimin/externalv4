@@ -61,5 +61,11 @@
             <version>1.2.6</version>
         </dependency>
 
+        <!-- amar监控 -->
+        <dependency>
+            <groupId>com.amarsoft.tool</groupId>
+            <artifactId>amarmonitorclient</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 </project>

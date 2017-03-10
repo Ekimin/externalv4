@@ -7,9 +7,9 @@
         <Property name="APP_HOME" value="."/>
 
         <!-- 自定义属性 -->
-        <Property name="DoserivesUrl" value="http://192.168.61.233:8092/DOService" />
+        <Property name="DoserivesUrl" value="http://192.168.67.84:8092/DOService" />
         <!-- RMI远程调用配置 -->
-        <Property name="registryHost" value="192.168.67.203"/>
+        <Property name="registryHost" value="192.168.67.84"/>
         <Property name="registryPort" value="1098"/>
         <Property name="RMISleepTime" value="60000"/> <!-- RMI调用异常时睡眠时间，单位：毫秒 -->
 
