@@ -23,15 +23,11 @@ public class ExternalV4Job implements ProcessJob {
         ExternalV4Job externalV4Job = new ExternalV4Job();
         //获取企业名单
         CommonMethod commonMethod = new CommonMethod();
-        //monitorModelList = commonMethod.getMonitorEnts(bankId, modelId);
+        monitorModelList = commonMethod.getMonitorEnts(bankId, modelId);
         boolean isChangedRunning = false;
+        boolean isChangedSuccess = false;
         String jobClassName = ExternalV4Job.class.getName();
         int rmiSleepTime = Integer.valueOf(ARE.getProperty("rmiSleepTime", "60"));
-
-//        //TODO:测试功能，给list加入一个指定企业
-        MonitorModel monitorModelTest = new MonitorModel();
-        monitorModelTest.setEnterpriseName("山东齐尊双凤酒业有限公司");
-        monitorModelList.add(monitorModelTest);
 
         // 调用RMI修改状态位
         while (!isChangedRunning) {
@@ -63,11 +59,11 @@ public class ExternalV4Job implements ProcessJob {
         externalV4Job.insertEntList(monitorModelList);
         ARE.getLog().info("插入企业名单到对应实体表，并初始化flow完成");
         // 调用RMI修改状态位
-        while (!isChangedRunning) {
+        while (!isChangedSuccess) {
             ARE.getLog().info("修改该job为success");
-            isChangedRunning = commonMethod.updateFlowStatusByRMI(azkabanExecId, jobClassName, "success");
+            isChangedSuccess = commonMethod.updateFlowStatusByRMI(azkabanExecId, jobClassName, "success");
             // 如果RMI服务未启动或者出现其他异常时，发邮件通知并休眠
-            if (!isChangedRunning) {
+            if (!isChangedSuccess) {
                 try {
                     ARE.getLog().info("调用RMI服务出错，休眠" + (rmiSleepTime / 1000) + "秒");
                     AmarMonitorAgent agent = new AmarMonitorAgent();
@@ -100,7 +96,7 @@ public class ExternalV4Job implements ProcessJob {
             allEntList.add(entName);
 
             for (String eName : allEntList) {
-                if (eName != null) {
+                if (eName != null && !eName.equals("")) {
                     commonMethod.syncMainEntToLiraOperation(eName, bankId, orgName);
                 }
             }

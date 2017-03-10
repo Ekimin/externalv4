@@ -1,4 +1,4 @@
-package com.amarsoft.requestqueue;
+package com.amarsoft.rmi.requestdata.requestqueue;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

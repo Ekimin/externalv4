@@ -2,7 +2,7 @@ package com.amarsoft.app.dao;
 
 import com.amarsoft.app.model.MonitorModel;
 import com.amarsoft.are.ARE;
-import com.amarsoft.requestqueue.IDataProcessTaskManage;
+import com.amarsoft.rmi.requestdata.requestqueue.IDataProcessTaskManage;
 import com.amarsoft.rmi.requestdata.CreatePocInspectListDate;
 import net.sf.json.JSONObject;
 import org.codehaus.xfire.client.Client;
