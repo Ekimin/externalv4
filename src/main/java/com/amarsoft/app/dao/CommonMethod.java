@@ -188,21 +188,20 @@ public class CommonMethod {
     }
 
     /**
-     * 通过接口，由企业名单生成spider_inspect_entity,并初始化data_process_task流程
-     *
+     * 通过接口，由企业名单生成spider_inspect_entity,并初始化data_process_task流程.
+     * <li>默认4种数据源都要</li>
      * @param orgname
      * @param entnameList
      * @return
      */
-    public boolean createPocInspectListDateV4(String orgname, String[] entnameList) {
+    public boolean createPocInspectListDate(String orgname, List<String> entnameList, List<String> datasourceList) {
         boolean flag = false;
         ARE.getLog().info("======================远程API方法调用开始===================");
         try {
             CreatePocInspectListDate createPocInspectListDate = (CreatePocInspectListDate)
                     Naming.lookup("rmi://" + registryHost + ":" + registryPort + "/pocInspectList");
-            for (String entName : entnameList) {
-                createPocInspectListDate.InsertPocInspectListOfV4(orgname, entName);
-            }
+
+            createPocInspectListDate.InsertPocInspectList(orgname, entnameList, datasourceList);
             flag = true;
         } catch (Exception e) {
             ARE.getLog().error("远程RMI出错", e);

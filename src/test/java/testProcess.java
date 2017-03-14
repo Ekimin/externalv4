@@ -22,7 +22,7 @@ public class testProcess {
         bankId = "poc-EDS测试账号";
         modelId = "V4报告";
         azkabanExecId = "aztest";
-        batchId = "poc-EDS测试账号-1489053234690";
+        batchId = "poc-测试-1489369482796";
         //获取报告名单企业
 
         if(bankId == null){

@@ -27,5 +27,5 @@ public interface CreatePocInspectListDate extends Remote{
      * @para entname：主体企业
      * @return success/failure
      */
-    public String InsertPocInspectListOfV4(String orgname,String entname) throws RemoteException;
+    public String InsertPocInspectListOfV4(String orgname,List <String> entnameList) throws RemoteException;
 }

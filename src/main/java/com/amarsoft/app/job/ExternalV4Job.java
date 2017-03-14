@@ -4,6 +4,7 @@ import com.amarsoft.amarmonitor.AmarMonitorAgent;
 import com.amarsoft.app.dao.CommonMethod;
 import com.amarsoft.app.model.MonitorModel;
 import com.amarsoft.are.ARE;
+import com.amarsoft.are.util.CommandLineArgument;
 import com.amarsoft.monitorPlugin.sink.ganglia.AbstractGangliaSink;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class ExternalV4Job implements ProcessJob {
 
     public void generateProcess(String azkabanExecId, String modelId, String bankId) {
 
-        List<MonitorModel> monitorModelList = new LinkedList<MonitorModel>();
+        List<MonitorModel> monitorModelList;
         ExternalV4Job externalV4Job = new ExternalV4Job();
         //获取企业名单
         CommonMethod commonMethod = new CommonMethod();
@@ -55,9 +56,14 @@ public class ExternalV4Job implements ProcessJob {
         ARE.getLog().info("挖完了......");
 
         //企业名单集体插入诉讼、舆情、失信、被执行人,初始化流程
-        ARE.getLog().info("开始插入企业名单到对应实体表，并初始化flow");
+        ARE.getLog().info("开始插入企业名单到对应实体表");
         externalV4Job.insertEntList(monitorModelList);
-        ARE.getLog().info("插入企业名单到对应实体表，并初始化flow完成");
+        ARE.getLog().info("插入企业名单到对应实体表");
+
+        ARE.getLog().info("开始初始化流程");
+        externalV4Job.createDataProcessTask(monitorModelList, bankId);
+        ARE.getLog().info("初始化流程结束");
+
         // 调用RMI修改状态位
         while (!isChangedSuccess) {
             ARE.getLog().info("修改该job为success");
@@ -76,7 +82,7 @@ public class ExternalV4Job implements ProcessJob {
             }
         }
         ARE.getLog().info("job状态为修改结束...");
-
+        ARE.getLog().info("》》》》》》》》》》》》》》程序执行完毕《《《《《《《《《《《《《《《");
     }
 
     /**
@@ -100,9 +106,65 @@ public class ExternalV4Job implements ProcessJob {
                     commonMethod.syncMainEntToLiraOperation(eName, bankId, orgName);
                 }
             }
-            commonMethod.createPocInspectListDateV4(bankId, relaEnts);
         }
     }
 
+    /**
+     * 生成dataprocess流程
+     * <li>默认4种数据源</li>
+     *
+     * @param monitorModelList
+     * @param orgname
+     */
+    public void createDataProcessTask(List<MonitorModel> monitorModelList, String orgname) {
+        CommonMethod commonMethod = new CommonMethod();
+        List<String> datasourceList = new LinkedList<String>();
+        List<String> entNameList = new LinkedList<String>();
 
+        datasourceList.add("舆情");
+        datasourceList.add("诉讼");
+        datasourceList.add("被执行人");
+        datasourceList.add("失信被执行人");
+
+        //
+
+        for (MonitorModel monitorModel : monitorModelList) {
+            String entName = monitorModel.getEnterpriseName();
+            String allEnts = monitorModel.getRelaEnts();
+            allEnts += ";" + entName;
+
+            String[] ents = allEnts.split(";");
+            List<String> entList = Arrays.asList(ents);
+            for(String ent : entList){
+
+                if (!"".equals(ent)) {
+                    entNameList.add(ent);
+                }
+            }
+
+        }
+        commonMethod.createPocInspectListDate(orgname, entNameList, datasourceList);
+    }
+
+
+    public static void main(String[] args){
+        if (!ARE.isInitOk()) {
+            ARE.init("etc/are.xml");
+        }
+        CommandLineArgument arg = new CommandLineArgument(args);
+
+        String bankId = arg.getArgument("bankId");//机构编号
+        String modelId = arg.getArgument("modelId");//模型编号
+        String azkabanExecId = arg.getArgument("azkabanExecId");//azkaban执行编号
+        String batchId = arg.getArgument("batchId");//王军批次号
+
+        if(bankId == null){
+            ARE.setProperty("BANKID", "noBankId");//日志文件按银行编号存储区分
+        }else{
+            ARE.setProperty("BANKID", bankId);//日志文件按银行编号存储区分
+        }
+
+        ExternalV4Job externalV4Job = new ExternalV4Job();
+        externalV4Job.generateProcess(azkabanExecId, modelId, bankId);
+    }
 }
