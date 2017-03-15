@@ -9,7 +9,7 @@
         <!-- 自定义属性 -->
         <Property name="DoserivesUrl" value="http://192.168.67.84:8092/DOService" />
         <!-- RMI远程调用配置 -->
-        <Property name="registryHost" value="192.168.67.203"/>
+        <Property name="registryHost" value="192.168.67.84"/>
         <Property name="registryPort" value="1098"/>
         <Property name="RMISleepTime" value="60000"/> <!-- RMI调用异常时睡眠时间，单位：毫秒 -->
 
@@ -20,7 +20,7 @@
         <!-- 日志服务，为应用系统提供全局统一的日志界面。日志服务是工厂模式实现的，通过日志工厂产生日志 缺省日志工厂可以产生四种日志DummyLog、SimpleLog、JDKLog和Log4JLog，
 			通过配置logType参数可以使用 不同的日志，对于每个日志的更为具体的属性则是由各自的配置文件logProperties决定的。 注意当改变了logType时，对应的logProperties也要对应改变 -->
 
-        <Service id="LOG" enabled="true" initOnStart="true">
+        <Service id="LOG" enabled="true" initOnStart="false">
             <Provider>Amarsoft</Provider>
             <Version>1.0</Version>
             <Describe>日志服务</Describe>

@@ -21,7 +21,7 @@ public class testProcess {
         //TODO:测试数据
         bankId = "poc-EDS测试账号";
         modelId = "V4报告";
-        azkabanExecId = "aztest";
+        azkabanExecId = "33350";
         batchId = "poc-测试-1489369482796";
         //获取报告名单企业
 

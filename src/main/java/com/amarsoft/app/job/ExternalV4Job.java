@@ -58,7 +58,9 @@ public class ExternalV4Job implements ProcessJob {
         //企业名单集体插入诉讼、舆情、失信、被执行人,初始化流程
         ARE.getLog().info("开始插入企业名单到对应实体表");
         externalV4Job.insertEntList(monitorModelList);
+
         ARE.getLog().info("插入企业名单到对应实体表");
+
 
         ARE.getLog().info("开始初始化流程");
         externalV4Job.createDataProcessTask(monitorModelList, bankId);
@@ -141,8 +143,8 @@ public class ExternalV4Job implements ProcessJob {
                     entNameList.add(ent);
                 }
             }
-
         }
+        ARE.getLog().info("TEST entName" + entNameList.toString());
         commonMethod.createPocInspectListDate(orgname, entNameList, datasourceList);
     }
 

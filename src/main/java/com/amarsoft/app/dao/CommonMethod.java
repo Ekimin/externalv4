@@ -201,7 +201,8 @@ public class CommonMethod {
             CreatePocInspectListDate createPocInspectListDate = (CreatePocInspectListDate)
                     Naming.lookup("rmi://" + registryHost + ":" + registryPort + "/pocInspectList");
 
-            createPocInspectListDate.InsertPocInspectList(orgname, entnameList, datasourceList);
+            String returnResult = createPocInspectListDate.InsertPocInspectList(orgname, entnameList, datasourceList);
+            ARE.getLog().info("returnResult=" + returnResult);
             flag = true;
         } catch (Exception e) {
             ARE.getLog().error("远程RMI出错", e);
