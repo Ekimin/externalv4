@@ -19,9 +19,9 @@ public class testProcess {
         String azkabanExecId = arg.getArgument("azkabanExecId");//azkaban执行编号
         String batchId = arg.getArgument("batchId");//王军批次号
         //TODO:测试数据
-        bankId = "poc-EDS测试账号";
+        bankId = "poc-测试";
         modelId = "V4报告";
-        azkabanExecId = "33350";
+        azkabanExecId = "123456";
         batchId = "poc-测试-1489369482796";
         //获取报告名单企业
 
@@ -32,6 +32,6 @@ public class testProcess {
         }
 
         ExternalV4Job externalV4Job = new ExternalV4Job();
-        externalV4Job.generateProcess(azkabanExecId, modelId, bankId);
+        externalV4Job.generateProcess(azkabanExecId, modelId, bankId, batchId);
     }
 }

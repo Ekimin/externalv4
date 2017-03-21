@@ -5,5 +5,5 @@ package com.amarsoft.app.job;
  * externalv4
  */
 public interface ProcessJob {
-    public void generateProcess(String flowId,String modelId,String bankId);
+    public void generateProcess(String flowId,String modelId,String bankId,String batchId);
 }

@@ -18,13 +18,14 @@ import java.util.List;
  */
 public class ExternalV4Job implements ProcessJob {
 
-    public void generateProcess(String azkabanExecId, String modelId, String bankId) {
+    public void generateProcess(String azkabanExecId, String modelId, String bankId, String batchId) {
 
         List<MonitorModel> monitorModelList;
         ExternalV4Job externalV4Job = new ExternalV4Job();
         //获取企业名单
         CommonMethod commonMethod = new CommonMethod();
-        monitorModelList = commonMethod.getMonitorEnts(bankId, modelId);
+        monitorModelList = commonMethod.getMonitorEnts(bankId, modelId, batchId);
+
         boolean isChangedRunning = false;
         boolean isChangedSuccess = false;
         String jobClassName = ExternalV4Job.class.getName();
@@ -55,12 +56,17 @@ public class ExternalV4Job implements ProcessJob {
         commonMethod.getRelaEnts(monitorModelList);
         ARE.getLog().info("挖完了......");
 
+        //获取其担保公司的外部数据
+        ARE.getLog().info("获取担保公司外部企业开始>>>>>>");
+
+        ARE.getLog().info("获取担保公司外部企业结束<<<<<<");
+
+
         //企业名单集体插入诉讼、舆情、失信、被执行人,初始化流程
-        ARE.getLog().info("开始插入企业名单到对应实体表");
+        ARE.getLog().info("开始插入企业名单到对应实体表>>>>>>");
         externalV4Job.insertEntList(monitorModelList);
 
-        ARE.getLog().info("插入企业名单到对应实体表");
-
+        ARE.getLog().info("插入企业名单到对应实体表结束<<<<<<");
 
         ARE.getLog().info("开始初始化流程");
         externalV4Job.createDataProcessTask(monitorModelList, bankId);
@@ -106,6 +112,7 @@ public class ExternalV4Job implements ProcessJob {
             for (String eName : allEntList) {
                 if (eName != null && !eName.equals("")) {
                     commonMethod.syncMainEntToLiraOperation(eName, bankId, orgName);
+                    commonMethod.syncMainEntToPiraOperation(eName, bankId, orgName);
                 }
             }
         }
@@ -128,15 +135,16 @@ public class ExternalV4Job implements ProcessJob {
         datasourceList.add("被执行人");
         datasourceList.add("失信被执行人");
 
-        //
+
 
         for (MonitorModel monitorModel : monitorModelList) {
             String entName = monitorModel.getEnterpriseName();
+            ARE.getLog().info("开始处理entName=" + entName);
             String allEnts = monitorModel.getRelaEnts();
             allEnts += ";" + entName;
-
             String[] ents = allEnts.split(";");
             List<String> entList = Arrays.asList(ents);
+
             for(String ent : entList){
 
                 if (!"".equals(ent)) {
@@ -144,7 +152,7 @@ public class ExternalV4Job implements ProcessJob {
                 }
             }
         }
-        ARE.getLog().info("TEST entName" + entNameList.toString());
+        ARE.getLog().info("企业List：" + entNameList.toString());
         commonMethod.createPocInspectListDate(orgname, entNameList, datasourceList);
     }
 
@@ -160,6 +168,13 @@ public class ExternalV4Job implements ProcessJob {
         String azkabanExecId = arg.getArgument("azkabanExecId");//azkaban执行编号
         String batchId = arg.getArgument("batchId");//王军批次号
 
+        ARE.getLog().info("----------------------------------------------");
+        ARE.getLog().info("bankId=" + bankId);
+        ARE.getLog().info("modelId=" + modelId);
+        ARE.getLog().info("azkabanExecId=" + azkabanExecId);
+        ARE.getLog().info("batchId=" + batchId);
+        ARE.getLog().info("----------------------------------------------");
+
         if(bankId == null){
             ARE.setProperty("BANKID", "noBankId");//日志文件按银行编号存储区分
         }else{
@@ -167,6 +182,6 @@ public class ExternalV4Job implements ProcessJob {
         }
 
         ExternalV4Job externalV4Job = new ExternalV4Job();
-        externalV4Job.generateProcess(azkabanExecId, modelId, bankId);
+        externalV4Job.generateProcess(azkabanExecId, modelId, bankId, batchId);
     }
 }
