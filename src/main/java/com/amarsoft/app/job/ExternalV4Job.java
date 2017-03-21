@@ -52,14 +52,9 @@ public class ExternalV4Job implements ProcessJob {
 
 
         //获取关联企业
-        ARE.getLog().info("开挖关联企业");
+        ARE.getLog().info("开挖关联企业及担保公司外部企业");
         commonMethod.getRelaEnts(monitorModelList);
         ARE.getLog().info("挖完了......");
-
-        //获取其担保公司的外部数据
-        ARE.getLog().info("获取担保公司外部企业开始>>>>>>");
-
-        ARE.getLog().info("获取担保公司外部企业结束<<<<<<");
 
 
         //企业名单集体插入诉讼、舆情、失信、被执行人,初始化流程
@@ -147,7 +142,7 @@ public class ExternalV4Job implements ProcessJob {
 
             for(String ent : entList){
 
-                if (!"".equals(ent)) {
+                if (!"".equals(ent) && !"".equals(ent)) {//企业名字为空过滤
                     entNameList.add(ent);
                 }
             }
